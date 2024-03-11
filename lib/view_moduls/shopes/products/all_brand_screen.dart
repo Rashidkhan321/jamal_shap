@@ -1,0 +1,354 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+
+import 'brand_detail_screen.dart';
+class all_brand extends StatefulWidget {
+  const all_brand({Key? key}) : super(key: key);
+
+  @override
+  State<all_brand> createState() => _all_brandState();
+}
+
+class _all_brandState extends State<all_brand> {
+  String serach = "";
+  final serachcontroller = TextEditingController();
+  final brand = FirebaseFirestore.instance.collection('brand').snapshots();
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height*.9;
+    final width = MediaQuery.of(context).size.width*.9;
+    int cartItemCount =2;
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('All Brands',style: TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 23
+          ),),
+        ),
+        actions: [
+          Stack(
+            alignment: Alignment.topRight,
+            children: [
+              IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  // Add your cart button logic here
+                },
+              ),
+              if (cartItemCount > 0)
+                Positioned(
+                  left: 1,
+                  top: 5,
+                  child: Container(
+
+
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '$cartItemCount',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              scrollDirection: Axis.vertical,
+
+              children: [
+                SizedBox(height: 10,),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      color: Colors.black12,
+                      height: 54,
+                      width: double.infinity,
+                      child: TextFormField(
+                        onChanged: (String value) {
+                          setState(() {});
+                          serach = value;
+                        },
+                        controller: serachcontroller,
+                        decoration: InputDecoration(
+
+                          suffixIcon: Icon(Icons.search_rounded),
+                          hintText: 'Serach Here',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          //border: BorderRadius.circular(50),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10,),
+
+
+                SizedBox(height: 10,),
+
+                StreamBuilder<QuerySnapshot>(
+                  stream: brand,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('ERROR');
+                    }
+                    else{
+                      return
+                      MasonryGridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        mainAxisSpacing: 1,
+                        crossAxisSpacing: 1,
+                        gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Number of columns in the grid
+// Add horizontal spacing between items
+
+                          //         mainAxisSpacing: 16.0,
+                        ),
+                        itemCount: snapshot.data!.docs.length, // Total number of items
+                        itemBuilder: (BuildContext context, int index) {
+                          final brandname = snapshot.data!.docs[index]['prodtuctname'].toString();
+                          final username = snapshot.data!.docs[index]['shop_owner'].toString();
+                          final userpassword = snapshot.data!.docs[index]['shop_owner_pass'].toString();
+                          final brndimage = snapshot.data!.docs[index]['productimage3'].toString();
+                          final shopid = snapshot.data!.docs[index]['shop_id'].toString();
+                          final brandid = snapshot.data!.docs[index]['productid'].toString();
+                          if(serachcontroller.text.isEmpty){
+                            return
+                              Column(
+
+                                children: [
+
+                                  Stack(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: InkWell(
+                                          onTap: (){
+                                            Navigator.push(context, MaterialPageRoute(builder: (context)=>brand_deatils(
+                                              barnd_image: brndimage, brandname: brandname,
+                                              shopid: shopid, username: username, userpassword: userpassword, brandid: brandid,)));
+                                          },
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Container(
+                                              height: height*.3,
+                                              width: width*.5,
+                                              color: Colors.red,
+                                              child: imagepick(imageurl:
+                                              snapshot.data!.docs[index]['productimage3'],),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                          bottom: 0,
+                                          left: 1,
+                                          right: 1,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(18.0),
+                                            child: Text(snapshot.data!.docs[index]['prodtuctname']),
+                                          )),
+
+                                    ],
+                                  ),
+
+                                ],
+
+                              );
+                          }
+                          else if(brandname.toLowerCase().contains(serachcontroller.text.toLowerCase())){
+                            return
+                              Column(
+
+                                children: [
+
+                                  Stack(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: InkWell(
+                                          onTap: (){
+                                            Navigator.push(context, MaterialPageRoute(builder: (context)=>brand_deatils(
+                                              barnd_image: brndimage, brandname: brandname,
+                                              shopid: shopid, username: username, userpassword: userpassword, brandid: brandid,)));
+                                          },
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Container(
+                                              height: height*.3,
+                                              width: width*.5,
+                                              color: Colors.red,
+                                              child: imagepick(imageurl:
+                                              snapshot.data!.docs[index]['productimage3'],),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                          bottom: 0,
+                                          left: 1,
+                                          right: 1,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(18.0),
+                                            child: Text(snapshot.data!.docs[index]['prodtuctname']),
+                                          )),
+
+                                    ],
+                                  ),
+
+                                ],
+
+                              );
+                          } else{
+                            return Container();
+                          }
+
+                        },
+                      );
+                    }
+                    },
+
+                ),
+
+
+              ],
+            ),
+          ),
+        ],
+      ),
+
+      // AppBar(
+      //   title: Padding(
+      //     padding: const EdgeInsets.all(8.0),
+      //     child: Text('Dashborad',style: TextStyle(
+      //         fontWeight: FontWeight.w900,
+      //         fontSize: 23
+      //     ),),
+      //   ),
+      //
+      //   actions: [
+      //     Padding(
+      //       padding: const EdgeInsets.all(24.0),
+      //       child: Row(
+      //         // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //         crossAxisAlignment: CrossAxisAlignment.start,
+      //         children: [
+      //           Icon(Ionicons.alert,size: 10,
+      //             color: Colors.black,),
+      //
+      //
+      //           Icon(Icons.shopping_cart, size: 20,),
+      //
+      //         ],
+      //       ),
+      //     )
+      //   ],
+      // )
+    );
+  }
+
+}
+class imagepick extends StatelessWidget {
+
+  final imageurl;
+
+  const imagepick({Key? key,
+    required this.imageurl,
+
+  }) : super(key: key,
+
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height:
+      MediaQuery.of(context).size.height *
+          0.4,
+      width: MediaQuery.of(context).size.width *
+          0.9,
+      child: Image(
+        fit: BoxFit.fill,
+        image: NetworkImage(imageurl),
+        loadingBuilder: ( BuildContext context, Widget child, ImageChunkEvent? loading ){
+
+          if(loading==null)
+            return child;
+          return Container(
+            height:
+            MediaQuery.of(context).size.height *
+                0.4,
+            width: MediaQuery.of(context).size.width *
+                0.9,
+            decoration: BoxDecoration(
+                color: Colors.green.shade200
+            ),
+            child: Center(
+
+
+                child: CircularProgressIndicator(color: Colors.black,)),
+          );
+        },
+        errorBuilder: (contex, exception, stack){
+          return Container(
+            decoration: BoxDecoration(
+                color: Colors.green.shade200
+            ),
+
+            height:
+            MediaQuery.of(context).size.height *
+                0.3,
+            width: MediaQuery.of(context).size.width *
+                0.9,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 18.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                children: [
+
+                  Icon(Icons.wifi_off, color: Colors.black,
+                    size: 30,),
+                  Container(
+                      margin: EdgeInsets.only(bottom: 13),
+                      child: Text('check internet connection!'))
+                ],
+              ),
+            ),
+          );
+        },
+
+      ),
+    );
+  }
+}

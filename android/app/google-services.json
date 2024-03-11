@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "926718943515",
+    "project_id": "wali-bussiness",
+    "storage_bucket": "wali-bussiness.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926718943515:android:730250a132514c6807b3be",
+        "android_client_info": {
+          "package_name": "com.example.jamal_shap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH1QGiAPRxaOtvP1p2r5f2f5Pe8sK0-JQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
